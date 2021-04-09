@@ -1,0 +1,14 @@
+Code and data for my paper "Stability and Similarity in Financial Networks - How do They Change in Times of Turbulence?"
+
+To run:
+1. Set up a virtualenv
+2. pip install -r requirements.txt
+3. source compile_cython.sh (this may not work if you don't use windows)
+4. Run modularity_over_time.py for each of the countries to do the community detection (change the country string to do for each country - values are DE, UK and US)
+5. To get figures 1 - 5, 10 - 13 for the paper run mst_analysis.py
+6. You'll need to change the country to generate the individual figures - this can be done by changing the country string (values are DE, UK and US)
+7. For figures 7 - 9, firstly create a folder for the PMFGs to sit in (the default name is networks_%country%_pmfg)
+8. Then run create_pmfg.py, this will create the PMFG for the specified country
+9. Run pmfg_analysis.py to create figures 7 - 9
+10. For figure 6, load the first graphml file from each of the folders into cytoscape
+11. Any questions or issues, feel free to drop me an email 

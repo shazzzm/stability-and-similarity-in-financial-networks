@@ -45,7 +45,7 @@ def calculate_corr(X, remove_market_mode=False, absolute=True):
         C = np.abs(C)
     return C
 
-country = "US"
+country = "DE"
 np.seterr(all='raise')
 slide_size = 30
 
@@ -81,7 +81,7 @@ print("We're running %s times" % no_runs)
 
 X_new = X[0:window_size, :]
 
-corr = calculate_corr(X_new, remove_market_mode)
+corr = calculate_corr(X_new)
 G = topcorr.pmfg(corr)
 #G=nx.from_numpy_matrix(corr)
 G=nx.relabel_nodes(G, dict(zip(G.nodes(), company_names)))
@@ -96,7 +96,7 @@ corr_values.append(corr.flatten())
 for x in range(1, no_runs):
     print("Run %s" % x)
     X_new = X[x*slide_size:(x+1)*slide_size+window_size, :]
-    corr = calculate_corr(X_new, remove_market_mode)
+    corr = calculate_corr(X_new)
 
     G = topcorr.pmfg(corr)
     G = nx.relabel_nodes(G, dict(zip(G.nodes(), company_names)))

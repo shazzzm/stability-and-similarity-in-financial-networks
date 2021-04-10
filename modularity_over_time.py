@@ -142,10 +142,10 @@ font = {'family' : 'normal',
 matplotlib.rc('font', **font)
 
 # Set the country you desire to analyze
-country = "UK"
+country = "DE"
 
 if country == "UK":
-    index_df = pd.read_csv("ftse_100_index.csv", index_col=0)
+    index_df = pd.read_csv("FTSE100_index.csv", index_col=0)
     df = pd.read_csv("FTSE100.csv", index_col=0)
     window_size = 252
     networks_folder = "networks_uk/"
@@ -269,6 +269,7 @@ ax = ts.plot(yerr=rand_scores_stdev)
 plt.ylabel("ARI")
 ax.set_ylim(0, 0.5)
 plt.tight_layout()
+plt.savefig("rand_scores_%s.png" % country)
 
 np.save(country + "_rand_scores_mean", rand_scores_mean)
 np.save(country + "_rand_scores_stdev", rand_scores_stdev)
@@ -279,6 +280,7 @@ ax = ts.plot(yerr=cluster_consistency_stdev)
 plt.ylabel("ARI")
 ax.set_ylim(0, 1)
 plt.tight_layout()
+plt.savefig("community_stability_%s.png" % country)
 
 np.save(country + "_cluster_consistency_mean", cluster_consistency_mean)
 np.save(country + "_cluster_consistency_stdev", cluster_consistency_stdev)
@@ -290,6 +292,7 @@ ax = ts.plot(yerr=number_of_clusters_stdev)
 plt.ylabel("Num. Communities")
 ax.set_ylim(0, 12)
 plt.tight_layout()
+plt.savefig("num_communities_%s.png" % country)
 
 np.save(country + "_num_clusters_mean", number_of_clusters_mean)
 np.save(country + "_num_clusters_stdev", number_of_clusters_stdev)
@@ -304,6 +307,7 @@ ax = ts.plot(yerr=cluster_consistency_current_stdev)
 plt.ylabel("ARI")
 ax.set_ylim(0, 1)
 plt.tight_layout()
+plt.savefig("community_consistency_%s.png" % country)
 
 #save_open_figures(country + "_clustering_")
 plt.close('all')

@@ -16,20 +16,6 @@ import topcorr
 import plotly.graph_objects as go
 import datetime
 
-def calculate_assortativity(corr):
-    p = corr.shape[0]
-
-    xs = []
-    ys = []
-
-    for i in range(p):
-        for j in range(p):
-            if i == j:
-                continue
-            xs += corr[i, :].tolist()
-            ys += corr[j, :].tolist()
-
-    return np.corrcoef(xs, ys)[0, 1]
 
 def katz_similarity(A, alpha=0.05):
     D = np.diag(A.sum(axis=0))
@@ -40,31 +26,6 @@ def katz_similarity(A, alpha=0.05):
     #sim = np.linalg.inv(aux)
     #np.fill_diagonal(sim, sim.diagonal()-1)
     return S
-
-def calculate_similarity(A, alpha=0.05):
-    eigs, eigv = np.linalg.eig(A)
-    l_max = eigs.max()
-    p = A.shape[0]
-    D = np.diag(A.sum(axis=0))
-    #if normalize:
-    #    D = np.diag(np.reciprocal(A.sum(axis=0)))
-    #else:
-    #    D = np.eye(p)
-    I = np.eye(p)
-    #vec = 2 * p * l_max * D @ np.linalg.inv(I - alpha/l_max * A) @ D
-    
-    S = np.eye(p)
-    num_iter = 100
-    for i in range(num_iter):
-        prev_S = S.copy()
-        S = alpha/l_max * A @ S + I
-        if np.allclose(prev_S, S, atol=1e-4):
-            break
-
-        if i == 99:
-            print("Did not converge")
-    D_inv = np.diag(np.reciprocal(A.sum(axis=0)))
-    return D_inv @ S @ D_inv
 
 def calculate_network_heterogeneity(G):
     val = 0
@@ -82,7 +43,7 @@ def calculate_network_heterogeneity(G):
 
     return val
 
-def calculate_corr(X, remove_market_mode=False):
+def calculate_corr(X):
     n, p = X.shape
 
     C = np.zeros((p, p))
@@ -95,23 +56,6 @@ def calculate_corr(X, remove_market_mode=False):
                 C[i, j] = 0
             else:
                 C[i, j] = np.corrcoef(X[:, i], X[:, j])[0, 1]
-
-    if remove_market_mode:
-        # Remove largest eigenvalue and leading eigenvector
-        eigs, eigv = np.linalg.eig(C)
-        i = np.argmax(eigs)
-        eigs[i] = 0
-        eigv[:, i] = np.zeros(p)
-        D = np.diag(eigs)
-        C = eigv.T @ D @ eigv
-
-        # Then renormalize
-        for i in range(p):
-            for j in range(p):
-                if C[i, i] == 0 or C[j, j] == 0:
-                    continue
-                else:
-                    C[i, j] = C[i, j] / np.sqrt(C[i, i] * C[j,j])
 
         np.fill_diagonal(C, 1)
     return C
@@ -194,22 +138,11 @@ X = df_2.values[1:, :-1]
 
 X_new = X[0:window_size, :]
 
-vix_df = pd.read_csv("vix.csv", index_col=0)
-vix_df.index = pd.to_datetime(vix_df.index)
 
-vix_mean = pd.Series()
 index_stdev = pd.Series()
 
 degree_heterogeneity = np.zeros(no_runs)
-mean_simrank = np.zeros(no_runs)
 mean_similarity = np.zeros(no_runs)
-assortativity = np.zeros(no_runs)
-
-degree_heterogeneity_mm_removed = np.zeros(no_runs)
-mean_simrank_mm_removed = np.zeros(no_runs)
-mean_similarity_mm_removed = np.zeros(no_runs)
-assortativity_mm_removed = np.zeros(no_runs)
-
 similarity_values = np.zeros((p, p, no_runs))
 
 intrasector_mean_similarity = collections.defaultdict(list)
@@ -244,9 +177,7 @@ for i,G in enumerate(graphs):
     np.fill_diagonal(similarity_M, 0)
     degree_heterogeneity[i] = calculate_network_heterogeneity(G)
     mean_similarity[i] = similarity_M[offdiag_ind].mean()
-    assortativity[i] = nx.degree_assortativity_coefficient(G)
     index_stdev[dates[i]] = df_2['Index'][(i*slide_size)+1:((i+1)*slide_size+window_size+1)].std()
-    vix_mean[dates[i]] = vix_df['Close'].iloc[(i*slide_size)+1:((i+1)*slide_size+window_size+1)].mean()
     similarity_values[:, :, i] = similarity_M
 
     point_bs_corr[i] = scipy.stats.pointbiserialr(sector_matrix.flatten(), similarity_M.flatten())[0]
@@ -277,22 +208,6 @@ plt.ylim([0.08, 0.2])
 plt.tight_layout()
 plt.savefig("degree_heterogeneity_%s.png" % country)
 properties_df['H'] = ts
-
-ts = pd.Series(mean_simrank, index=dt)
-plt.figure()
-ts.plot()
-plt.ylabel("Mean Simrank")
-plt.tight_layout()
-plt.savefig("mean_simrank_%s.png" % country)
-properties_df['$\\mu_{sr}$'] = ts
-
-ts = pd.Series(assortativity, index=dt)
-plt.figure()
-ts.plot()
-plt.ylabel("A")
-plt.tight_layout()
-plt.savefig("assortativity_%s.png" % country)
-properties_df['A'] = ts
 
 ts = pd.Series(mean_similarity, index=dt)
 plt.figure()

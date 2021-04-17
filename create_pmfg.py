@@ -45,12 +45,12 @@ def calculate_corr(X, remove_market_mode=False, absolute=True):
         C = np.abs(C)
     return C
 
-country = "DE"
+country = "UK"
 np.seterr(all='raise')
 slide_size = 30
 
 if country == "UK":
-    index_df = pd.read_csv("ftse_100_index.csv", index_col=0)
+    index_df = pd.read_csv("FTSE100_index.csv", index_col=0)
     df = pd.read_csv("FTSE100.csv", index_col=0)
     networks_folder = "networks_uk_pmfg/"
     window_size = 252

@@ -142,7 +142,7 @@ font = {'family' : 'normal',
 matplotlib.rc('font', **font)
 
 # Set the country you desire to analyze
-country = "DE"
+country = "US"
 
 if country == "UK":
     index_df = pd.read_csv("FTSE100_index.csv", index_col=0)

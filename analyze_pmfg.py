@@ -89,7 +89,7 @@ country = "DE"
 
 slide_size = 30
 if country == "UK":
-    index_df = pd.read_csv("ftse_100_index.csv", index_col=0)
+    index_df = pd.read_csv("FTSE100_index.csv", index_col=0)
     df = pd.read_csv("FTSE100.csv", index_col=0)
     networks_folder = "networks_uk_pmfg/"
     window_size = 252
@@ -221,6 +221,7 @@ ts = pd.Series(edge_changes, index=dt_2)
 plt.figure()
 ts.plot()
 plt.ylabel("Fraction of Edge Changes")
+plt.ylim([0, 0.55])
 plt.tight_layout()
 plt.savefig("edge_changes_%s.png" % country)
 properties_df['Edge Changes'] = ts

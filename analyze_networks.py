@@ -23,9 +23,10 @@ def mean_node_difference(M):
     s = 0
     for i in range(p):
         row = M[i, :]
-        other_rows = M[indices!=i, :]
-        for j,other in enumerate(other_rows):
-            s += np.linalg.norm(row - other)
+        for j in range(p):
+            if i == j:
+                continue
+            s += np.linalg.norm(row - M[j, :])
     C_sum = M.sum()
     mean = 1/(p * (p-1)) * s
     #mean = (1/C_sum) * s
@@ -49,11 +50,11 @@ def mean_cosine_distance(M):
     indices = np.arange(p)
     s = []
     for i in range(p):
-        row = M[indices!=i, i]
+        row = M[:, i]
         for j in range(i, p):
             if i == j:
                 continue
-            other_row = M[indices!=j, j]
+            other_row = M[:, j]
             s.append(scipy.spatial.distance.cosine(row, other_row))
 
     return np.mean(s), np.std(s)
@@ -83,7 +84,7 @@ matplotlib.rc('font', **font)
 
 
 # Set the country you desire to analyze
-country = "DE"
+country = "US"
 if country == "UK":
     index_df = pd.read_csv("FTSE100_index.csv", index_col=0)
     df = pd.read_csv("FTSE100.csv", index_col=0)
